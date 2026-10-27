@@ -1,4 +1,3 @@
-```yaml
 name: Generar documentación
 
 on:
@@ -43,4 +42,4 @@ jobs:
           name: documentacion-html
           path: site/
           if-no-files-found: error
-```
+
