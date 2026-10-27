@@ -1,0 +1,9 @@
+site_name: Documentación del proyecto
+site_description: Documentación técnica del proyecto y sus acciones locales
+docs_dir: docs
+site_dir: site
+
+nav:
+  - Inicio: index.md
+  - Estructura del proyecto: estructura.md
+  - Acciones locales: acciones-locales.md

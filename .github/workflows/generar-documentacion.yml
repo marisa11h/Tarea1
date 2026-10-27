@@ -1,0 +1,46 @@
+```yaml
+name: Generar documentación
+
+on:
+  push:
+    branches:
+      - feature/generar-documentacion
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'requirements.txt'
+      - '.github/workflows/generar-documentacion.yml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generar-documentacion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Generar documentación HTML
+        run: mkdocs build --strict
+
+      - name: Guardar documentación generada
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentacion-html
+          path: site/
+          if-no-files-found: error
+```
