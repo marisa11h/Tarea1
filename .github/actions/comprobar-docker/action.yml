@@ -1,0 +1,11 @@
+name: Comprobar estructura con Docker
+description: Comprueba los archivos y directorios usando Docker
+
+inputs:
+  paths:
+    description: Rutas que se deben comprobar
+    required: true
+
+runs:
+  using: docker
+  image: Dockerfile

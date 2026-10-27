@@ -1,0 +1,32 @@
+name: Comprobar estructura con acción compuesta
+description: Comprueba los archivos y directorios mediante Bash
+
+inputs:
+  paths:
+    description: Rutas que se deben comprobar
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Comprobar archivos y carpetas
+      shell: bash
+      env:
+        PATHS: ${{ inputs.paths }}
+      run: |
+        IFS=',' read -ra PATH_LIST <<< "$PATHS"
+
+        ERRORS=0
+
+        for ITEM in "${PATH_LIST[@]}"; do
+          ITEM="$(echo "$ITEM" | xargs)"
+
+          if [[ -f "$ITEM" || -d "$ITEM" ]]; then
+            echo "OK: Existe $ITEM"
+          else
+            echo "ERROR: No existe $ITEM"
+            ERRORS=1
+          fi
+        done
+
+        exit "$ERRORS"

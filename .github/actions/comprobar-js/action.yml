@@ -1,0 +1,11 @@
+name: Comprobar estructura con JavaScript
+description: Comprueba los archivos y directorios del proyecto
+
+inputs:
+  paths:
+    description: Rutas que se deben comprobar
+    required: true
+
+runs:
+  using: node20
+  main: index.js
