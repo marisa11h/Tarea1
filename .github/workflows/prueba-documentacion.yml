@@ -1,0 +1,62 @@
+name: Comprobar estructura del proyecto
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar-estructura:
+    name: Probar las tres acciones locales
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+        id: checkout
+
+      - name: Comprobar con JavaScript
+        id: javascript
+        if: always() && steps.checkout.outcome == 'success'
+        uses: ./.github/actions/comprobar-js
+        with:
+          paths: "README.md,CONTRIBUTING.md,CHANGELOG.md,LICENSE,.gitignore,SECURITY.md,requirements.txt,.env.example,docs,.github/workflows,.github/actions,.github/actions/comprobar-js/action.yml,.github/actions/comprobar-js/index.js,.github/actions/comprobar-docker/action.yml,.github/actions/comprobar-docker/Dockerfile,.github/actions/comprobar-docker/comprobar.sh,.github/actions/comprobar-compuesta/action.yml,.github/workflows/prueba-documentacion.yml"
+        continue-on-error: true
+
+      - name: Comprobar con Docker
+        id: docker
+        if: always() && steps.checkout.outcome == 'success'
+        uses: ./.github/actions/comprobar-docker
+        with:
+          paths: "README.md,CONTRIBUTING.md,CHANGELOG.md,LICENSE,.gitignore,SECURITY.md,requirements.txt,.env.example,docs,.github/workflows,.github/actions,.github/actions/comprobar-js/action.yml,.github/actions/comprobar-js/index.js,.github/actions/comprobar-docker/action.yml,.github/actions/comprobar-docker/Dockerfile,.github/actions/comprobar-docker/comprobar.sh,.github/actions/comprobar-compuesta/action.yml,.github/workflows/prueba-documentacion.yml"
+        continue-on-error: true
+
+      - name: Comprobar con acción compuesta
+        id: compuesta
+        if: always() && steps.checkout.outcome == 'success'
+        uses: ./.github/actions/comprobar-compuesta
+        with:
+          paths: "README.md,CONTRIBUTING.md,CHANGELOG.md,LICENSE,.gitignore,SECURITY.md,requirements.txt,.env.example,docs,.github/workflows,.github/actions,.github/actions/comprobar-js/action.yml,.github/actions/comprobar-js/index.js,.github/actions/comprobar-docker/action.yml,.github/actions/comprobar-docker/Dockerfile,.github/actions/comprobar-docker/comprobar.sh,.github/actions/comprobar-compuesta/action.yml,.github/workflows/prueba-documentacion.yml"
+        continue-on-error: true
+
+      - name: Mostrar resultados finales
+        if: always()
+        env:
+          JS_RESULT: ${{ steps.javascript.outcome }}
+          DOCKER_RESULT: ${{ steps.docker.outcome }}
+          COMPOSITE_RESULT: ${{ steps.compuesta.outcome }}
+        shell: bash
+        run: |
+          echo "Resultado JavaScript: $JS_RESULT"
+          echo "Resultado Docker: $DOCKER_RESULT"
+          echo "Resultado acción compuesta: $COMPOSITE_RESULT"
+
+          if [[ "$JS_RESULT" != "success" ||
+                "$DOCKER_RESULT" != "success" ||
+                "$COMPOSITE_RESULT" != "success" ]]; then
+            echo "ERROR: Alguna de las acciones ha fallado."
+            exit 1
+          fi
+
+          echo "ÉXITO: Las tres acciones han comprobado la estructura correctamente."
